@@ -253,13 +253,13 @@ async function runBetFlow(claim, walletAddress, photo, postUri, betId, displayNa
 
   console.log(`[${betId.slice(0, 10)}] Starting bet flow...`);
 
-  // Step 1: Upload photo and create wrong.people record (if photo provided)
+  // Step 1: Upload photo to PDS (if photo provided)
   let wrongPeopleUri = null;
   let photoHash = ethers.ZeroHash;
 
   if (photo) {
     try {
-      console.log(`[${betId.slice(0, 10)}] Uploading photo blob...`);
+      console.log(`[${betId.slice(0, 10)}] Uploading photo blob to PDS...`);
       const blobData = await uploadBlob(photo);
       console.log(`[${betId.slice(0, 10)}] Blob uploaded: ${blobData.blob.ref.$link}`);
 
@@ -275,7 +275,7 @@ async function runBetFlow(claim, walletAddress, photo, postUri, betId, displayNa
       const blobCid = blobData.blob.ref.$link;
       photoHash = ethers.keccak256(ethers.toUtf8Bytes(blobCid));
     } catch (e) {
-      console.error(`[${betId.slice(0, 10)}] Photo upload failed:`, e.message);
+      console.error(`[${betId.slice(0, 10)}] PDS photo upload failed:`, e.message);
       // Continue without photo
     }
   }
@@ -352,7 +352,7 @@ async function runBetFlow(claim, walletAddress, photo, postUri, betId, displayNa
         replyText = `Error case\n\n${shortAddr} wins!\n\n${resolveCeloscanUrl}`;
       }
     } else {
-      // FALSE - include link to wrong.people record on pdsls.dev AND the resolve tx
+      // FALSE - include link to wrong.people record and resolve tx
       if (wrongPeopleUri) {
         const pdslsUrl = `https://pdsls.dev/${wrongPeopleUri}`;
         replyText = `wrong.people.look.like.this: ${pdslsUrl}\n\nContract resolved: ${resolveCeloscanUrl}`;
